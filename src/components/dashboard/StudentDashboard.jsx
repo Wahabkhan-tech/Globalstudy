@@ -1,16 +1,29 @@
 import { useState } from 'react';
 import ProfileUpdate from './Studentcomponent/ProfileUpdate';
-import Profile from '../../pages/Profile';
+// import Profile from '../../pages/Profile';
 import StatusUpdate from './Studentcomponent/StatusUpdate';
 import UniversityList from './Studentcomponent/UniversityList';
 import ScheduleAppointment from './Studentcomponent/ScheduleAppointment';
 import Messages from './Studentcomponent/Messages';
 // import Calendar from './Studentcomponent/Calendar';
 import CurrencyConverter from './Studentcomponent/CurrencyConverter';
+import ProfileTab from '../../pages/Profile'; // Updated import path based on error trace
 
 const StudentDashboard = () => {
   const [ActiveTab] = useState('Profile');
-  const formProgress = 60; // Example: 60% completion
+  const [formProgress, setFormProgress] = useState(() => {
+    const savedCompletedSteps = localStorage.getItem('completedSteps');
+    if (savedCompletedSteps) {
+      const completedSteps = JSON.parse(savedCompletedSteps);
+      const completedCount = Object.values(completedSteps).filter(Boolean).length;
+      return (completedCount / 7) * 100; // 7 steps excluding the review step
+    }
+    return 0;
+  });
+
+  const handleProgressUpdate = (progress) => {
+    setFormProgress(progress);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 font-sans">
@@ -25,7 +38,7 @@ const StudentDashboard = () => {
             ></div>
           </div>
           <p className="text-sm text-gray-600 mt-2">
-            {formProgress}% Complete
+            {Math.round(formProgress)}% Complete
             {formProgress < 100 && (
               <span className="ml-2 text-indigo-600 font-medium">
                 - Fill out remaining fields to complete your profile
@@ -34,10 +47,9 @@ const StudentDashboard = () => {
           </p>
         </div>
 
-
-        <Profile/>
+        {/* <Profile /> */}
         {/* Profile Update Section */}
-        <ProfileUpdate />
+        <ProfileTab onProgressUpdate={handleProgressUpdate} />
 
         {/* Status Update Section */}
         <StatusUpdate />
@@ -47,7 +59,6 @@ const StudentDashboard = () => {
           <UniversityList title="Top 5 Universities Worldwide (Till Date)" />
           <UniversityList title="Top 5 Universities Worldwide (This Month)" />
         </div>
-
 
         {/* Schedule Appointment, Messages, Calendar, and Currency Converter */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
