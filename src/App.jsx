@@ -5,7 +5,7 @@ import Users from './pages/Users';
 import Analytics from './pages/Analytics';
 import Content from './pages/Content';
 import Media from './pages/Media';
-import Profile from './pages/Profile';
+import Profile from './components/dashboard/StudentDashboard/StudentComponent/Profile';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
 import Queries from './pages/Queries';
@@ -13,14 +13,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { getCurrentUser } from './utils/auth';
 import Helpdesk from './pages/Helpdesk';
-import Counselors from './components/dashboard/badge/Counselors';
-import MediaChannelPartner from './components/dashboard/badge/MediaChannelPartner';
-import HelpdeskManager from './components/dashboard/badge/HelpdeskManager';
-import VisaStatus from './components/dashboard/badge/VisaStatus';
-import AppliedCandidates from './components/dashboard/badge/AppliedCandidates';
-import Payout from './components/dashboard/badge/Payout';
-import Universities from './components/dashboard/badge/Universities';
-import Student from './components/dashboard/badge/Student';
 
 const ProtectedRoute = ({ children }) => {
   const user = getCurrentUser();
@@ -53,14 +45,6 @@ function App() {
           <Route path="courses" element={<Courses />} />
           <Route path="students" element={<Students />} /> {/* Existing Students page */}
           <Route path="queries" element={<Queries />} />
-          <Route path="dashboard/students" element={<Student />} /> {/* New badge Student */}
-          <Route path="dashboard/counselors" element={<Counselors />} />
-          <Route path="dashboard/media-channel" element={<MediaChannelPartner />} />
-          <Route path="dashboard/helpdesk-manager" element={<HelpdeskManager />} />
-          <Route path="dashboard/visa-status" element={<VisaStatus />} />
-          <Route path="dashboard/applied-candidates" element={<AppliedCandidates />} />
-          <Route path="dashboard/payout" element={<Payout />} />
-          <Route path="dashboard/universities" element={<Universities />} />
         </Route>
       </Routes>
     </BrowserRouter>

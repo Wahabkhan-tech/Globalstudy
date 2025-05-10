@@ -1,9 +1,15 @@
 import { useOutletContext, useLocation } from 'react-router-dom';
-import StudentDashboard from './StudentDashboard';
+import StudentDashboard from './StudentDashboard/StudentDashboard';
 import HelpdeskStepperForm from '../../pages/Helpdeskform';
 import HelpdeskDataRecords from '../../pages/HelpdeskDataRecords';
 import BadgeCard from '../cards/BadgeCard';
 import FeatureCard from '../cards/FeatureCard';
+import WelcomeSection from './Counselor/WelcomeSection';
+import QuickStatsCards from './Counselor/QuickStatsCards';
+import AssignedStudentsTable from './Counselor/AssignedStudentsTable';
+import RecentActivityFeed from './Counselor/RecentActivityFeed';
+import ChatSummaryCard from './Counselor/ChatSummaryCard';
+import FiltersPanel from './Counselor/FiltersPanel';
 import {
   UserGroupIcon,
   ClockIcon,
@@ -189,7 +195,9 @@ const Dashboard = () => {
   if (userRole === 'admin') {
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold capitalize mb-6 text-gray-800">
+        <h2 yayıml
+
+ className="text-2xl font-bold capitalize mb-6 text-gray-800">
           Welcome, {userRole.replace('_', ' ')}!
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -224,12 +232,26 @@ const Dashboard = () => {
     );
   }
 
+  if (userRole === 'counselor') {
+    return (
+      <div className="flex-1">
+        <WelcomeSection counselorName="John Doe" />
+        <QuickStatsCards />
+        <FiltersPanel />
+        <AssignedStudentsTable />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <RecentActivityFeed />
+          <ChatSummaryCard />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold capitalize mb-6 text-gray-800">
         Welcome, {userRole || 'Guest'}!
       </h2>
-      <p>No specific dashboard configured for this role.</p>
       {features[userRole] && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features[userRole].map((feature, index) => (
@@ -240,39 +262,6 @@ const Dashboard = () => {
               icon={featureIcons[feature] || DocumentTextIcon}
             />
           ))}
-        </div>
-      )}
-      {userRole === 'counselor' && (
-        <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Counselor Features</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-lg shadow hover:bg-blue-50 transition-all duration-200 flex items-center space-x-4">
-              <UserGroupIcon className="w-8 h-8 text-gray-600" />
-              <div className="flex-1">
-                <h4 className="text-lg font-semibold text-gray-800">Student Assignment</h4>
-                <p className="text-gray-600">View and manage assigned students.</p>
-                <button
-                  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200"
-                  disabled
-                >
-                  Coming Soon
-                </button>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-4 rounded-lg shadow hover:bg-blue-50 transition-all duration-200 flex items-center space-x-4">
-              <EnvelopeIcon className="w-8 h-8 text-gray-600" />
-              <div className="flex-1">
-                <h4 className="text-lg font-semibold text-gray-800">Chat with Students</h4>
-                <p className="text-gray-600">Communicate with students in real-time.</p>
-                <button
-                  className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200"
-                  disabled
-                >
-                  Coming Soon
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>
