@@ -26,6 +26,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
       'Content Management',
       'Help-Desk Officer',
       'Media Uploads',
+      'Student Management', // Added for super_admin
     ],
     student: ['Profile View', 'Course Access', 'Help-Desk Officer'],
     counselor: ['Student Management', 'Course Management', 'Help-Desk Officer'],
@@ -84,7 +85,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
-      <div className="flex items-center justify-between mb-6 p-4 ">
+      <div className="flex items-center justify-between mb-6 p-4">
         <div className="flex items-center">
           <svg
             className="w-8 h-8 text-black"
@@ -100,7 +101,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
               d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
             />
           </svg>
-          {!isCollapsed && <h2 className="text-xl font-semibold ml-3 ">Global Study</h2>}
+          {!isCollapsed && <h2 className="text-xl font-semibold ml-3">Global Study</h2>}
         </div>
         <button
           onClick={toggleSidebar}
