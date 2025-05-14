@@ -132,7 +132,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
         <div className="px-2 mb-4">
           <button
             onClick={handleLogout}
-            className="flex items-center w-full p-3 rounded-lg  hover:bg-red-500 hover:text-amber-50 text-red-500  transition-colors duration-200"
+            className="flex items-center w-full p-3 rounded-lg hover:bg-red-500 hover:text-amber-50 text-red-500 transition-colors duration-200"
             aria-label="Logout"
           >
             <ArrowRightOnRectangleIcon className="w-5 h-5" />

@@ -10,6 +10,7 @@ import AssignedStudentsTable from './Counselor/AssignedStudentsTable';
 import RecentActivityFeed from './Counselor/RecentActivityFeed';
 import ChatSummaryCard from './Counselor/ChatSummaryCard';
 import FiltersPanel from './Counselor/FiltersPanel';
+import User from '../../pages/Users'; // Adjust path as needed
 import {
   UserGroupIcon,
   ClockIcon,
@@ -130,6 +131,29 @@ const Dashboard = () => {
     { title: 'Helpdesk Deleted', value: 0, color: 'bg-red-500', icon: MinusCircleIcon, type: 'user', role: 'helpdesk_officer' },
   ];
 
+  // Mock user data for super_admin User Management
+  const mockUsers = [
+    { id: 'S001', name: 'Jane Smith', role: 'student', status: 'Active', assignedTo: '', region: 'North America' },
+    { id: 'C001', name: 'Dr. Lee', role: 'counselor', status: 'Active', assignedTo: 'Admin', region: 'Asia' },
+    { id: 'M001', name: 'Mark Jones', role: 'media_channel', status: 'Pending', assignedTo: '', region: 'Europe' },
+    { id: 'H001', name: 'Sarah Adams', role: 'helpdesk_officer', status: 'Inactive', assignedTo: 'Admin', region: 'Africa' },
+  ];
+
+  const handleAssign = (id) => {
+    console.log(`Assigning user ${id}`);
+    // Add assign logic (e.g., API call)
+  };
+
+  const handleUpdateStatus = (id, status) => {
+    console.log(`Updating user ${id} status to ${status}`);
+    // Add status update logic (e.g., API call)
+  };
+
+  const handleView = (user) => {
+    console.log(`Viewing user:`, user);
+    // Add view logic (e.g., navigate to user profile)
+  };
+
   if (userRole === 'student') {
     return <StudentDashboard />;
   }
@@ -159,6 +183,17 @@ const Dashboard = () => {
   }
 
   if (userRole === 'super_admin') {
+    if (location.pathname === '/users') {
+      return (
+        <User
+          role="super_admin"
+          users={mockUsers}
+          onAssign={handleAssign}
+          onupdatesStatus={handleUpdateStatus}
+          onView={handleView}
+        />
+      );
+    }
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Welcome, Super Admin!</h2>       
@@ -193,11 +228,20 @@ const Dashboard = () => {
   }
 
   if (userRole === 'admin') {
+    if (location.pathname === '/users') {
+      return (
+        <User
+          role="admin"
+          users={mockUsers}
+          onAssign={handleAssign}
+          onUpdateStatus={handleUpdateStatus}
+          onView={handleView}
+        />
+      );
+    }
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 yayıml
-
- className="text-2xl font-bold capitalize mb-6 text-gray-800">
+        <h2 className="text-2xl font-bold capitalize mb-6 text-gray-800">
           Welcome, {userRole.replace('_', ' ')}!
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -230,6 +274,10 @@ const Dashboard = () => {
         </div>
       </div>
     );
+  }
+
+  if (userRole === 'counselor' && location.pathname === '/students') {
+    return <Students />;
   }
 
   if (userRole === 'counselor') {

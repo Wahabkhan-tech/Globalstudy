@@ -1,32 +1,41 @@
+import { useState } from 'react';
+import User from '../pages/Users'; // Adjust path as needed
+
 const Students = () => {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Student Management</h2>
-        <p className="text-gray-600 mb-4">Manage student records and progress.</p>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 border-b">ID</th>
-                <th className="py-2 px-4 border-b">Name</th>
-                <th className="py-2 px-4 border-b">Course</th>
-                <th className="py-2 px-4 border-b">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="py-2 px-4 border-b">S001</td>
-                <td className="py-2 px-4 border-b">Jane Smith</td>
-                <td className="py-2 px-4 border-b">Mathematics 101</td>
-                <td className="py-2 px-4 border-b">
-                  <button className="text-blue-600 hover:underline">View</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
+  const [students, setStudents] = useState([
+    { id: 'S001', name: 'Jane Smith', course: 'Mathematics 101', status: 'Active', assignedTo: '', region: 'North America', admission_stage: 'Profile', role: 'student' },
+    { id: 'S002', name: 'John Doe', course: 'Physics 201', status: 'Pending', assignedTo: 'Teacher XYZ', region: 'Asia', admission_stage: 'Institution', role: 'student' },
+    { id: 'S003', name: 'Alice Johnson', course: 'Chemistry 101', status: 'Completed', assignedTo: 'Teacher XYZ', region: 'Europe', admission_stage: 'Visa Preparation', role: 'student' },
+    { id: 'S004', name: 'Bob Brown', course: 'Computer Science 101', status: 'Inactive', assignedTo: '', region: 'Africa', admission_stage: 'Joining Uni', role: 'student' },
+  ]);
+
+  const handleAssign = (id) => {
+    console.log(`Assigning student ${id}`);
+    // Add additional assign logic if needed (e.g., API call)
   };
-  
-  export default Students;
+
+  const handleUpdateStatus = (id, status) => {
+    console.log(`Updating student ${id} status to ${status}`);
+    setStudents(students.map(student =>
+      student.id === id ? { ...student, status } : student
+    ));
+  };
+
+  const handleView = (student) => {
+    console.log(`Viewing student:`, student);
+    // Add view logic (e.g., navigate to student profile)
+  };
+
+  return (
+    <User
+      role="counselor"
+      users={students}
+      onAssign={handleAssign}
+      onUpdateStatus={handleUpdateStatus}
+      onView={handleView}
+      hideControls={true}
+    />
+  );
+};
+
+export default Students;

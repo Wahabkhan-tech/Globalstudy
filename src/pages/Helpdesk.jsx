@@ -1,7 +1,7 @@
 const Helpdesk = () => {
     return (
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Support Tickets</h2>
+        <h2 className="text-2xl font-bold mb-4">HelpDesk Support</h2>
         <p className="text-gray-600 mb-4">View and manage support tickets.</p>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
