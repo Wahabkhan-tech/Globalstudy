@@ -2,7 +2,7 @@ import { useState } from 'react';
 import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel';
 import CreateUserModal from './CreateUserModal';
 
-const User = ({ role, onAssign, onUpdateStatus, onView }) => {
+const User = ({ role, users, onAssign, onUpdateStatus, onView, hideControls = false, tableType }) => {
   const initialUsers = [
     { id: 'S001', name: 'Jane Smith', role: 'student', course: 'Mathematics 101', admission_stage: 'Profile', status: 'Active', assignedTo: '', region: 'North America' },
     { id: 'S002', name: 'John Doe', role: 'student', course: 'Physics 201', admission_stage: 'Institution', status: 'Pending', assignedTo: 'Teacher XYZ', region: 'Asia' },
@@ -14,9 +14,9 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
     { id: 'M002', name: 'Lisa Taylor', role: 'media_channel', status: 'Inactive', assignedTo: 'Admin', region: 'Australia' },
   ];
 
-  const [studentUsers, setStudentUsers] = useState(initialUsers.filter(u => u.role === 'student'));
-  const [counselorUsers, setCounselorUsers] = useState(initialUsers.filter(u => u.role === 'counselor'));
-  const [mcpUsers, setMcpUsers] = useState(initialUsers.filter(u => u.role === 'media_channel'));
+  const [studentUsers, setStudentUsers] = useState(users && users[0]?.role === 'student' ? users : initialUsers.filter(u => u.role === 'student'));
+  const [counselorUsers, setCounselorUsers] = useState(users && users[0]?.role === 'counselor' ? users : initialUsers.filter(u => u.role === 'counselor'));
+  const [mcpUsers, setMcpUsers] = useState(users && users[0]?.role === 'media_channel' ? users : initialUsers.filter(u => u.role === 'media_channel'));
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -93,19 +93,21 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
         <table className="w-full divide-y divide-gray-200 table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedUserIds(users.map(user => user.id));
-                    } else {
-                      setSelectedUserIds([]);
-                    }
-                  }}
-                  checked={users.length > 0 && selectedUserIds.length === users.length}
-                />
-              </th>
+              {!hideControls && (
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUserIds(users.map(user => user.id));
+                      } else {
+                        setSelectedUserIds([]);
+                      }
+                    }}
+                    checked={users.length > 0 && selectedUserIds.length === users.length}
+                  />
+                </th>
+              )}
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               {showStudentColumns ? (
@@ -125,13 +127,15 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
             {users.length > 0 ? (
               users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-2 py-2 w-12">
-                    <input
-                      type="checkbox"
-                      checked={selectedUserIds.includes(user.id)}
-                      onChange={() => handleCheckboxChange(user.id)}
-                    />
-                  </td>
+                  {!hideControls && (
+                    <td className="px-2 py-2 w-12">
+                      <input
+                        type="checkbox"
+                        checked={selectedUserIds.includes(user.id)}
+                        onChange={() => handleCheckboxChange(user.id)}
+                      />
+                    </td>
+                  )}
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[80px]">{user.id}</td>
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[120px]">{user.name}</td>
                   {showStudentColumns ? (
@@ -184,7 +188,7 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={showStudentColumns ? 8 : 7} className="px-2 py-2 text-center text-sm text-gray-500">
+                <td colSpan={showStudentColumns ? (hideControls ? 7 : 8) : (hideControls ? 6 : 7)} className="px-2 py-2 text-center text-sm text-gray-500">
                   No {userRole}s found.
                 </td>
               </tr>
@@ -205,25 +209,27 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
           ? 'Manage student records, progress, and assignments.'
           : 'Manage all users, their roles, and statuses.'}
       </p>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm mb-2 sm:mb-0"
-        >
-          Create User
-        </button>
-        <button
-          onClick={handleDeleteUsers}
-          disabled={selectedUserIds.length === 0}
-          className={`px-4 py-2 rounded-lg text-sm ${
-            selectedUserIds.length === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-red-500 text-white hover:bg-red-600'
-          }`}
-        >
-          Delete Selected Users
-        </button>
-      </div>
+      {!hideControls && (
+        <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm mb-2 sm:mb-0"
+          >
+            Create User
+          </button>
+          <button
+            onClick={handleDeleteUsers}
+            disabled={selectedUserIds.length === 0}
+            className={`px-4 py-2 rounded-lg text-sm ${
+              selectedUserIds.length === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
+          >
+            Delete Selected Users
+          </button>
+        </div>
+      )}
       <FiltersPanel
         studentUsers={studentUsers}
         setStudentUsers={setStudentUsers}
@@ -232,7 +238,11 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
         mcpUsers={mcpUsers}
         setMcpUsers={setMcpUsers}
       />
-      {role === 'counselor' ? (
+      {tableType === 'counselor' ? (
+        renderTable(counselorUsers, 'counselor')
+      ) : tableType === 'media_channel' ? (
+        renderTable(mcpUsers, 'media_channel')
+      ) : role === 'counselor' ? (
         renderTable(studentUsers, 'student', true)
       ) : (
         <>

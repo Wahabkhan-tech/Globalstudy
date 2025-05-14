@@ -8,6 +8,7 @@ import Media from './pages/Media';
 import Profile from './components/dashboard/StudentDashboard/StudentComponent/Profile';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
+import Counselor from './pages/Counselor'; // Import Counselor component
 import Queries from './pages/Queries';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -43,7 +44,8 @@ function App() {
           <Route path="media" element={<Media />} />
           <Route path="profile" element={<Profile />} />
           <Route path="courses" element={<Courses />} />
-          <Route path="students" element={<Students />} /> {/* Existing Students page */}
+          <Route path="students" element={<Students />} />
+          <Route path="counselors" element={<Counselor />} /> {/* Added Counselors route */}
           <Route path="queries" element={<Queries />} />
         </Route>
       </Routes>

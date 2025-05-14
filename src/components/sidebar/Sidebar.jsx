@@ -26,10 +26,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
       'Content Management',
       'Help-Desk Officer',
       'Media Uploads',
-      'Student Management', // Added for super_admin
+      'Student Management',
+      'Counselor Management', // Added for super_admin
     ],
     student: ['Profile View', 'Course Access', 'Help-Desk Officer'],
-    counselor: ['Student Management', 'Course Management', 'Help-Desk Officer'],
+    counselor: ['Student Management', 'Course Management', 'Help-Desk Officer', 'Counselor Management'], // Added for counselor
     media_channel: ['Content Management', 'Media Uploads'],
     helpdesk_officer: ['Help-Desk Officer', 'User Queries', 'Upload Data', 'Data Records'],
   };
@@ -44,6 +45,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     'Course Access': '/courses',
     'Course Management': '/courses',
     'Student Management': '/students',
+    'Counselor Management': '/counselors', // Added for counselors route
     'User Queries': '/queries',
     'Upload Data': '/helpdesk/upload-data',
     'Data Records': '/helpdesk/data-records',
@@ -60,6 +62,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     { name: 'Courses', path: '/courses', icon: BookOpenIcon, feature: 'Course Access' },
     { name: 'Courses', path: '/courses', icon: BookOpenIcon, feature: 'Course Management' },
     { name: 'Students', path: '/students', icon: UserGroupIcon, feature: 'Student Management' },
+    { name: 'Counselors', path: '/counselors', icon: UserGroupIcon, feature: 'Counselor Management' }, // Added for counselors
     { name: 'Queries', path: '/queries', icon: QuestionMarkCircleIcon, feature: 'User Queries' },
     { name: 'Upload Data', path: '/helpdesk/upload-data', icon: DocumentTextIcon, feature: 'Upload Data' },
     { name: 'Data Records', path: '/helpdesk/data-records', icon: DocumentTextIcon, feature: 'Data Records' },
