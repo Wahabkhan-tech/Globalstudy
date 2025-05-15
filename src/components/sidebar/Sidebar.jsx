@@ -12,25 +12,36 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowRightOnRectangleIcon,
+  AcademicCapIcon,
+  UserCircleIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  BuildingOffice2Icon,
+  RectangleStackIcon,
 } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
 import { logout } from '../../utils/auth';
 
 const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [openSubMenu, setOpenSubMenu] = useState({});
 
   const features = {
     super_admin: [
       'User Management',
-      'Analytics',
-      'Content Management',
-      'Help-Desk Officer',
-      'Media Uploads',
       'Student Management',
-      'Counselor Management', // Added for super_admin
+      'Counselor Management',
+      'Course Management',
+      'Universities',
+      'Courses Table',
     ],
     student: ['Profile View', 'Course Access', 'Help-Desk Officer'],
-    counselor: ['Student Management', 'Course Management', 'Help-Desk Officer', 'Counselor Management'], // Added for counselor
+    counselor: [
+      'Student Management',
+      'Help-Desk Officer',
+      // Removed 'Course Management', 'Universities', 'Courses Table'
+    ],
     media_channel: ['Content Management', 'Media Uploads'],
     helpdesk_officer: ['Help-Desk Officer', 'User Queries', 'Upload Data', 'Data Records'],
   };
@@ -45,10 +56,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     'Course Access': '/courses',
     'Course Management': '/courses',
     'Student Management': '/students',
-    'Counselor Management': '/counselors', // Added for counselors route
+    'Counselor Management': '/counselors',
     'User Queries': '/queries',
     'Upload Data': '/helpdesk/upload-data',
     'Data Records': '/helpdesk/data-records',
+    'Universities': '/courses/universities',
+    'Courses Table': '/courses/table',
   };
 
   const baseMenuItems = [
@@ -60,9 +73,18 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     { name: 'Media', path: '/media', icon: FilmIcon, feature: 'Media Uploads' },
     { name: 'Profile', path: '/profile', icon: UserIcon, feature: 'Profile View' },
     { name: 'Courses', path: '/courses', icon: BookOpenIcon, feature: 'Course Access' },
-    { name: 'Courses', path: '/courses', icon: BookOpenIcon, feature: 'Course Management' },
-    { name: 'Students', path: '/students', icon: UserGroupIcon, feature: 'Student Management' },
-    { name: 'Counselors', path: '/counselors', icon: UserGroupIcon, feature: 'Counselor Management' }, // Added for counselors
+    {
+      name: 'Courses',
+      path: '/courses',
+      icon: BookOpenIcon,
+      feature: 'Course Management',
+      subItems: [
+        { name: 'Universities', path: '/courses/universities', icon: BuildingOffice2Icon, feature: 'Universities' },
+        { name: 'Courses Table', path: '/courses/table', icon: RectangleStackIcon, feature: 'Courses Table' },
+      ],
+    },
+    { name: 'Students', path: '/students', icon: AcademicCapIcon, feature: 'Student Management' },
+    { name: 'Counselors', path: '/counselors', icon: UserCircleIcon, feature: 'Counselor Management' },
     { name: 'Queries', path: '/queries', icon: QuestionMarkCircleIcon, feature: 'User Queries' },
     { name: 'Upload Data', path: '/helpdesk/upload-data', icon: DocumentTextIcon, feature: 'Upload Data' },
     { name: 'Data Records', path: '/helpdesk/data-records', icon: DocumentTextIcon, feature: 'Data Records' },
@@ -73,13 +95,39 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     (item) => item.feature === null || allowedFeatures.includes(item.feature)
   );
 
+  useEffect(() => {
+    console.log('Initializing submenus. User role:', userRole);
+    const initialSubMenus = menuItems
+      .filter((item) => item.subItems)
+      .reduce((acc, item) => ({ ...acc, [item.name]: true }), {});
+    setOpenSubMenu(initialSubMenus);
+    console.log('Submenu state set to:', initialSubMenus);
+  }, [userRole]);
+
+  useEffect(() => {
+    console.log('Checking location:', location.pathname, 'isCollapsed:', isCollapsed);
+    if (location.pathname === '/') {
+      setIsCollapsed(false);
+    }
+  }, [location.pathname, setIsCollapsed]);
+
   const toggleSidebar = () => {
+    console.log('Toggling sidebar. Current isCollapsed:', isCollapsed);
     setIsCollapsed(!isCollapsed);
   };
 
   const handleLogout = () => {
+    console.log('Logging out');
     logout();
     navigate('/login');
+  };
+
+  const toggleSubMenu = (name) => {
+    console.log('Toggling submenu:', name, 'Current state:', openSubMenu[name]);
+    setOpenSubMenu((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
   };
 
   return (
@@ -118,18 +166,67 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
         <ul className="space-y-2 px-2">
           {menuItems.map((item, index) => (
             <li key={index}>
-              <Link
-                to={item.path}
-                className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
-                  location.pathname === item.path
-                    ? 'bg-blue-500 text-white'
-                    : 'text-black hover:bg-blue-500 hover:text-white'
-                }`}
-                aria-label={item.name}
-              >
-                <item.icon className="w-5 h-5" />
-                {!isCollapsed && <span className="ml-3">{item.name}</span>}
-              </Link>
+              {item.subItems ? (
+                <>
+                  <div
+                    className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                      location.pathname === item.path ||
+                      item.subItems.some((subItem) => location.pathname === subItem.path)
+                        ? 'bg-blue-500 text-white'
+                        : 'text-black hover:bg-blue-500 hover:text-white'
+                    }`}
+                    onClick={() => toggleSubMenu(item.name)}
+                    aria-label={item.name}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {!isCollapsed && <span className="ml-3 flex-1">{item.name}</span>}
+                    {!isCollapsed && (
+                      <button>
+                        {openSubMenu[item.name] ? (
+                          <ChevronUpIcon className="w-5 h-5" />
+                        ) : (
+                          <ChevronDownIcon className="w-5 h-5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  {!isCollapsed && openSubMenu[item.name] && (
+                    <ul className="ml-6 mt-2 space-y-1">
+                      {item.subItems
+                        .filter((subItem) => allowedFeatures.includes(subItem.feature))
+                        .map((subItem, subIndex) => (
+                          <li key={subIndex}>
+                            <Link
+                              to={subItem.path}
+                              className={`flex items-center p-2 rounded-lg text-sm transition-colors duration-200 ${
+                                location.pathname === subItem.path
+                                  ? 'bg-blue-500 text-white'
+                                  : 'text-black hover:bg-blue-500 hover:text-white'
+                              }`}
+                              aria-label={subItem.name}
+                            >
+                              <subItem.icon className="w-4 h-4" />
+                              <span className="ml-3">{subItem.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                    location.pathname === item.path
+                      ? 'bg-blue-500 text-white'
+                      : 'text-black hover:bg-blue-500 hover:text-white'
+                  }`}
+                  aria-label={item.name}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {!isCollapsed && <span className="ml-3">{item.name}</span>}
+                </Link>
+              )}
             </li>
           ))}
         </ul>

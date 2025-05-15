@@ -1,15 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 
-const CreateUserModal = ({ onClose, onCreate }) => {
+const CreateUserModal = ({ onClose, onSubmit, mode = 'create', user = null, pageRole = '' }) => {
   const [formData, setFormData] = useState({
-    id: '',
-    name: '',
-    role: 'student',
-    course: '',
-    admission_stage: '',
-    status: 'Active',
-    assignedTo: '',
-    region: '',
+    id: user?.id || '',
+    name: user?.name || '',
+    role: user?.role || 'student',
+    course: user?.course || '',
+    admission_stage: user?.admission_stage || '',
+    status: user?.status || 'Active',
+    assignedTo: user?.assignedTo || '',
+    region: user?.region || '',
   });
 
   const [errors, setErrors] = useState({});
@@ -22,8 +22,8 @@ const CreateUserModal = ({ onClose, onCreate }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
@@ -46,7 +46,7 @@ const CreateUserModal = ({ onClose, onCreate }) => {
       return;
     }
 
-    const newUser = {
+    const submittedUser = {
       id: formData.id,
       name: formData.name,
       role: formData.role,
@@ -59,7 +59,8 @@ const CreateUserModal = ({ onClose, onCreate }) => {
       region: formData.region,
     };
 
-    onCreate(newUser);
+    onSubmit(submittedUser);
+    onClose();
   };
 
   const handleOutsideClick = (e) => {
@@ -75,13 +76,42 @@ const CreateUserModal = ({ onClose, onCreate }) => {
     };
   }, []);
 
+  // Determine the heading based on mode and pageRole
+  const getHeading = () => {
+    const action = mode === 'create' ? 'Create New' : 'Edit';
+    switch (pageRole) {
+      case 'student':
+        return `${action} Student`;
+      case 'counselor':
+        return `${action} Counselor`;
+      case 'media_channel':
+        return `${action} Media Channel`;
+      default:
+        return `${action} User`;
+    }
+  };
+
+  // Determine the button text based on mode and pageRole
+  const getButtonText = () => {
+    const action = mode === 'create' ? 'Create' : 'Update';
+    switch (pageRole) {
+      case 'student':
+        return `${action} Student`;
+      case 'counselor':
+        return `${action} Counselor`;
+      case 'media_channel':
+        return `${action} Media Channel`;
+      default:
+        return action;
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div
-        ref={modalRef}
-        className="bg-white rounded-lg p-6 w-full max-w-[90vw] sm:max-w-2xl overflow-y-auto max-h-[90vh]"
-      >
-        <h2 className="text-xl font-semibold text-gray-800 mb-6">Create New User</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+      <div ref={modalRef} className="bg-white rounded-lg p-6 w-full max-w-[90vw] sm:max-w-2xl overflow-y-auto max-h-[90vh]">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6">
+          {getHeading()}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="mb-4">
@@ -93,6 +123,7 @@ const CreateUserModal = ({ onClose, onCreate }) => {
                 onChange={handleChange}
                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                 placeholder="e.g., S001"
+                disabled={mode === 'edit'}
               />
               {errors.id && <p className="text-red-500 text-xs mt-1">{errors.id}</p>}
             </div>
@@ -212,7 +243,7 @@ const CreateUserModal = ({ onClose, onCreate }) => {
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
             >
-              Create
+              {getButtonText()}
             </button>
           </div>
         </form>

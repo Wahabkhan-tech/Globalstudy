@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel';
-import CreateUserModal from './CreateUserModal';
+import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel'; // Adjust path as per your Vite project structure
+import CreateUserModal from './CreateUserModal'; // Adjust path to your CreateUserModal.jsx
 
-const User = ({ role, onAssign, onUpdateStatus, onView }) => {
+const User = ({ role, pageRole = '', users, onUpdateStatus, hideControls = false, onFilterChange }) => {
   const initialUsers = [
     { id: 'S001', name: 'Jane Smith', role: 'student', course: 'Mathematics 101', admission_stage: 'Profile', status: 'Active', assignedTo: '', region: 'North America' },
     { id: 'S002', name: 'John Doe', role: 'student', course: 'Physics 201', admission_stage: 'Institution', status: 'Pending', assignedTo: 'Teacher XYZ', region: 'Asia' },
@@ -14,67 +14,64 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
     { id: 'M002', name: 'Lisa Taylor', role: 'media_channel', status: 'Inactive', assignedTo: 'Admin', region: 'Australia' },
   ];
 
-  const [studentUsers, setStudentUsers] = useState(initialUsers.filter(u => u.role === 'student'));
-  const [counselorUsers, setCounselorUsers] = useState(initialUsers.filter(u => u.role === 'counselor'));
-  const [mcpUsers, setMcpUsers] = useState(initialUsers.filter(u => u.role === 'media_channel'));
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [studentUsers, setStudentUsers] = useState(users && users[0]?.role === 'student' ? users : initialUsers.filter(u => u.role === 'student'));
+  const [counselorUsers, setCounselorUsers] = useState(users && users[0]?.role === 'counselor' ? users : initialUsers.filter(u => u.role === 'counselor'));
+  const [mcpUsers, setMcpUsers] = useState(users && users[0]?.role === 'media_channel' ? users : initialUsers.filter(u => u.role === 'media_channel'));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('create');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newStatus, setNewStatus] = useState('');
   const [selectedUserIds, setSelectedUserIds] = useState([]);
-
-  const statusOptions = ['Active', 'Pending', 'Completed', 'Inactive'];
-
-  const handleAssign = (id, userRole) => {
-    const setUsers = {
-      student: setStudentUsers,
-      counselor: setCounselorUsers,
-      media_channel: setMcpUsers,
-    }[userRole];
-    setUsers(prev => prev.map(user =>
-      user.id === id ? { ...user, assignedTo: 'Teacher XYZ' } : user
-    ));
-    if (onAssign) onAssign(id);
-  };
-
-  const handleOpenUpdateModal = (user) => {
-    setSelectedUser(user);
-    setNewStatus(user.status);
-    setIsUpdateModalOpen(true);
-  };
-
-  const handleUpdateStatus = () => {
-    if (selectedUser && newStatus) {
-      const setUsers = {
-        student: setStudentUsers,
-        counselor: setCounselorUsers,
-        media_channel: setMcpUsers,
-      }[selectedUser.role];
-      setUsers(prev => prev.map(user =>
-        user.id === selectedUser.id ? { ...user, status: newStatus } : user
-      ));
-      if (onUpdateStatus) onUpdateStatus(selectedUser.id, newStatus);
-      setIsUpdateModalOpen(false);
-      setSelectedUser(null);
-      setNewStatus('');
-    }
-  };
+  const [modalPageRole, setModalPageRole] = useState(''); // State for modal pageRole
 
   const handleCreateUser = (newUser) => {
+    const updatedUsers = [...(users || initialUsers), newUser];
     const setUsers = {
       student: setStudentUsers,
       counselor: setCounselorUsers,
       media_channel: setMcpUsers,
     }[newUser.role];
     setUsers(prev => [...prev, newUser]);
-    setIsCreateModalOpen(false);
+    if (onFilterChange) onFilterChange(updatedUsers);
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    const setUsers = {
+      student: setStudentUsers,
+      counselor: setCounselorUsers,
+      media_channel: setMcpUsers,
+    }[updatedUser.role];
+    const updatedUsers = (users || initialUsers).map(user =>
+      user.id === updatedUser.id ? updatedUser : user
+    );
+    setUsers(prev => prev.map(user =>
+      user.id === updatedUser.id ? updatedUser : user
+    ));
+    if (onUpdateStatus) onUpdateStatus(updatedUser.id, updatedUser.status);
+    if (onFilterChange) onFilterChange(updatedUsers);
+  };
+
+  const handleSubmitUser = (userData) => {
+    if (modalMode === 'create') {
+      handleCreateUser(userData);
+    } else {
+      handleUpdateUser(userData);
+    }
+  };
+
+  const handleOpenModal = (mode, user = null) => {
+    setModalMode(mode);
+    setSelectedUser(user);
+    setModalPageRole(mode === 'edit' && user ? user.role : pageRole);
+    setIsModalOpen(true);
   };
 
   const handleDeleteUsers = () => {
     if (selectedUserIds.length === 0) return;
+    const updatedUsers = (users || initialUsers).filter(user => !selectedUserIds.includes(user.id));
     setStudentUsers(prev => prev.filter(user => !selectedUserIds.includes(user.id)));
     setCounselorUsers(prev => prev.filter(user => !selectedUserIds.includes(user.id)));
     setMcpUsers(prev => prev.filter(user => !selectedUserIds.includes(user.id)));
+    if (onFilterChange) onFilterChange(updatedUsers);
     setSelectedUserIds([]);
   };
 
@@ -84,28 +81,36 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
     );
   };
 
+  const handleStatusChange = (id, newStatus) => {
+    if (onUpdateStatus) {
+      onUpdateStatus(id, newStatus);
+    }
+  };
+
   const renderTable = (users, userRole, showStudentColumns = false) => (
     <div className="mb-8">
       <h3 className="text-lg font-semibold text-gray-800 mb-4">
         {userRole === 'student' ? 'Students' : userRole === 'counselor' ? 'Counselors' : 'Media Channels (MCPs)'}
       </h3>
-      <div className="w-full overflow-x-hidden">
+      <div className="w-full overflow-x-auto">
         <table className="w-full divide-y divide-gray-200 table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
-                <input
-                  type="checkbox"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setSelectedUserIds(users.map(user => user.id));
-                    } else {
-                      setSelectedUserIds([]);
-                    }
-                  }}
-                  checked={users.length > 0 && selectedUserIds.length === users.length}
-                />
-              </th>
+              {!hideControls && (
+                <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUserIds(users.map(user => user.id));
+                      } else {
+                        setSelectedUserIds([]);
+                      }
+                    }}
+                    checked={users.length > 0 && selectedUserIds.length === users.length}
+                  />
+                </th>
+              )}
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               {showStudentColumns ? (
@@ -125,13 +130,15 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
             {users.length > 0 ? (
               users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-2 py-2 w-12">
-                    <input
-                      type="checkbox"
-                      checked={selectedUserIds.includes(user.id)}
-                      onChange={() => handleCheckboxChange(user.id)}
-                    />
-                  </td>
+                  {!hideControls && (
+                    <td className="px-2 py-2 w-12">
+                      <input
+                        type="checkbox"
+                        checked={selectedUserIds.includes(user.id)}
+                        onChange={() => handleCheckboxChange(user.id)}
+                      />
+                    </td>
+                  )}
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[80px]">{user.id}</td>
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[120px]">{user.name}</td>
                   {showStudentColumns ? (
@@ -143,40 +150,41 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
                     <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[100px] hidden md:table-cell">{user.role}</td>
                   )}
                   <td className="px-2 py-2 text-sm">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.status === 'Active'
-                          ? 'bg-green-100 text-green-800'
-                          : user.status === 'Pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : user.status === 'Completed'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {user.status}
-                    </span>
+                    {role === 'counselor' && userRole === 'student' ? (
+                      <select
+                        value={user.status}
+                        onChange={(e) => handleStatusChange(user.id, e.target.value)}
+                        className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Inactive">Inactive</option>
+                      </select>
+                    ) : (
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          user.status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : user.status === 'Pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : user.status === 'Completed'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {user.status}
+                      </span>
+                    )}
                   </td>
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[100px] hidden md:table-cell">{user.assignedTo || 'Not Assigned'}</td>
                   <td className="px-2 py-2 text-sm">
                     <div className="flex flex-col space-y-1 md:flex-row md:space-y-0 md:space-x-2">
                       <button
-                        onClick={() => handleAssign(user.id, user.role)}
+                        onClick={() => handleOpenModal(role === 'counselor' && userRole === 'student' ? 'view' : 'edit', user)}
                         className="text-blue-600 hover:text-blue-800 hover:underline text-xs"
                       >
-                        {user.assignedTo ? 'Reassign' : 'Assign'}
-                      </button>
-                      <button
-                        onClick={() => handleOpenUpdateModal(user)}
-                        className="text-blue-600 hover:text-blue-800 hover:underline text-xs"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => onView(user)}
-                        className="text-indigo-600 hover:text-indigo-800 hover:underline text-xs"
-                      >
-                        View
+                        {role === 'counselor' && userRole === 'student' ? 'View' : 'Edit'}
                       </button>
                     </div>
                   </td>
@@ -184,7 +192,7 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={showStudentColumns ? 8 : 7} className="px-2 py-2 text-center text-sm text-gray-500">
+                <td colSpan={showStudentColumns ? (hideControls ? 7 : 8) : (hideControls ? 6 : 7)} className="px-2 py-2 text-center text-sm text-gray-500">
                   No {userRole}s found.
                 </td>
               </tr>
@@ -205,34 +213,36 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
           ? 'Manage student records, progress, and assignments.'
           : 'Manage all users, their roles, and statuses.'}
       </p>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm mb-2 sm:mb-0"
-        >
-          Create User
-        </button>
-        <button
-          onClick={handleDeleteUsers}
-          disabled={selectedUserIds.length === 0}
-          className={`px-4 py-2 rounded-lg text-sm ${
-            selectedUserIds.length === 0
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-red-500 text-white hover:bg-red-600'
-          }`}
-        >
-          Delete Selected Users
-        </button>
-      </div>
-      <FiltersPanel
-        studentUsers={studentUsers}
-        setStudentUsers={setStudentUsers}
-        counselorUsers={counselorUsers}
-        setCounselorUsers={setCounselorUsers}
-        mcpUsers={mcpUsers}
-        setMcpUsers={setMcpUsers}
-      />
-      {role === 'counselor' ? (
+      {!hideControls && (
+        <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+          <button
+            onClick={() => handleOpenModal('create')}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm mb-2 sm:mb-0"
+          >
+            {pageRole === 'student' ? 'Create Student' : pageRole === 'counselor' ? 'Create Counselor' : pageRole === 'media_channel' ? 'Create Media Channel' : 'Create User'}
+          </button>
+          <button
+            onClick={handleDeleteUsers}
+            disabled={selectedUserIds.length === 0}
+            className={`px-4 py-2 rounded-lg text-sm ${
+              selectedUserIds.length === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-red-500 text-white hover:bg-red-600'
+            }`}
+          >
+            Delete Selected Users
+          </button>
+        </div>
+      )}
+      {users && (
+        <FiltersPanel
+          users={users}
+          onFilterChange={onFilterChange}
+        />
+      )}
+      {users ? (
+        renderTable(users, users[0]?.role || 'student', users[0]?.role === 'student')
+      ) : role === 'counselor' ? (
         renderTable(studentUsers, 'student', true)
       ) : (
         <>
@@ -242,65 +252,14 @@ const User = ({ role, onAssign, onUpdateStatus, onView }) => {
         </>
       )}
 
-      {isCreateModalOpen && (
+      {isModalOpen && (
         <CreateUserModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onCreate={handleCreateUser}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmitUser}
+          mode={modalMode}
+          user={selectedUser}
+          pageRole={modalPageRole}
         />
-      )}
-
-      {isUpdateModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-4 w-full max-w-[90vw] sm:max-w-sm overflow-y-auto max-h-[90vh]">
-            <h3 className="text-base font-semibold mb-4">
-              {selectedUser?.role === 'student' ? 'Student Details' : `${selectedUser?.role.charAt(0).toUpperCase() + selectedUser?.role.slice(1)} Details`}
-            </h3>
-            <div className="mb-4 text-sm">
-              <p><strong>ID:</strong> {selectedUser?.id}</p>
-              <p><strong>Name:</strong> {selectedUser?.name}</p>
-              {selectedUser?.role === 'student' ? (
-                <>
-                  <p><strong>Course:</strong> {selectedUser?.course}</p>
-                  <p><strong>Admission Stage:</strong> {selectedUser?.admission_stage}</p>
-                </>
-              ) : (
-                <p><strong>Role:</strong> {selectedUser?.role}</p>
-              )}
-              <p><strong>Current Status:</strong> {selectedUser?.status}</p>
-              <p><strong>Assigned To:</strong> {selectedUser?.assignedTo || 'Not Assigned'}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Update Status
-              </label>
-              <select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => setIsUpdateModalOpen(false)}
-                className="px-3 py-1 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdateStatus}
-                className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
-              >
-                Update
-              </button>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
