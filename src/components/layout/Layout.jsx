@@ -43,7 +43,7 @@ const Layout = () => {
           <main className="flex-1 p-6 pt-20 overflow-auto">
             <Outlet context={{ userRole, setUserRole }} />
           </main>
-          <Footer />
+          {/* <Footer /> */}
         </div>
       </div>
     </div>
