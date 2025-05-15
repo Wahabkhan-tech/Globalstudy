@@ -29,7 +29,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
 
   const features = {
     super_admin: [
-      'User Management',
       'Student Management',
       'Counselor Management',
       'Course Management',

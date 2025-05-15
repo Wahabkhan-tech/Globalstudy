@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel'; // Adjust path as per your Vite project structure
-import CreateUserModal from './CreateUserModal'; // Adjust path to your CreateUserModal.jsx
+import CreateUserModal from '../modals/CreateUserModal'; // Adjust path to your CreateUserModal.jsx
 
 const User = ({ role, pageRole = '', users, onUpdateStatus, hideControls = false, onFilterChange }) => {
   const initialUsers = [
@@ -21,7 +21,7 @@ const User = ({ role, pageRole = '', users, onUpdateStatus, hideControls = false
   const [modalMode, setModalMode] = useState('create');
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const [modalPageRole, setModalPageRole] = useState(''); // State for modal pageRole
+  const [modalPageRole, setModalPageRole] = useState('');
 
   const handleCreateUser = (newUser) => {
     const updatedUsers = [...(users || initialUsers), newUser];
