@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CreateUniversityModal from '../modals/CreateUniversityModal';
-import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel'; // Updated to use new FiltersPanel in src/pages
+import FiltersPanel from '../components/dashboard/Counselor/FiltersPanel';
 
 const Universities = ({ universities, onUpdateStatus, hideControls = false, onFilterChange }) => {
   const initialUniversities = [
@@ -24,6 +24,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
       has_online_programs: true,
       notable_alumni: ['Barack Obama', 'Bill Gates'],
       status: 'Active',
+      contract: 'Direct',
     },
     {
       university_id: 'U002',
@@ -45,6 +46,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
       has_online_programs: true,
       notable_alumni: ['Lester Pearson', 'Margaret Atwood'],
       status: 'Active',
+      contract: 'MOU',
     },
     {
       university_id: 'U003',
@@ -66,6 +68,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
       has_online_programs: false,
       notable_alumni: ['Stephen Hawking', 'J.R.R. Tolkien'],
       status: 'Inactive',
+      contract: 'Referred',
     },
     {
       university_id: 'U004',
@@ -87,6 +90,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
       has_online_programs: true,
       notable_alumni: ['Gough Whitlam', 'John Howard'],
       status: 'Active',
+      contract: 'Direct',
     },
   ];
 
@@ -173,6 +177,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">Ranking</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Type</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Contract</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Website</th>
               <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -206,6 +211,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
                       {university.status}
                     </span>
                   </td>
+                  <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[100px] hidden md:table-cell">{university.contract}</td>
                   <td className="px-2 py-2 text-sm text-gray-900 truncate max-w-[150px] hidden md:table-cell">
                     <a href={university.website} target="_blank" className="text-blue-600 hover:underline">
                       Link
@@ -225,7 +231,7 @@ const Universities = ({ universities, onUpdateStatus, hideControls = false, onFi
               ))
             ) : (
               <tr>
-                <td colSpan={hideControls ? 9 : 10} className="px-2 py-2 text-center text-sm text-gray-500">
+                <td colSpan={hideControls ? 10 : 11} className="px-2 py-2 text-center text-sm text-gray-500">
                   No universities found.
                 </td>
               </tr>

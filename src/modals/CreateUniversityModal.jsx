@@ -21,6 +21,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
     has_online_programs: university?.has_online_programs || false,
     notable_alumni: university?.notable_alumni?.join(', ') || '',
     status: university?.status || 'Active',
+    contract: university?.contract || 'Direct MOU',
   });
 
   const [errors, setErrors] = useState({});
@@ -29,6 +30,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
   const statusOptions = ['Active', 'Inactive'];
   const typeOptions = ['Public', 'Private', 'Ivy League'];
   const languageOptions = ['English', 'Spanish', 'French', 'German'];
+  const contractOptions = ['Direct MOU', 'Indirect MOU', 'Referred'];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,6 +70,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
       international_students_percentage: parseFloat(formData.international_students_percentage) || 0,
       average_tuition_fee_usd: parseFloat(formData.average_tuition_fee_usd) || 0,
       notable_alumni: formData.notable_alumni ? formData.notable_alumni.split(',').map((item) => item.trim()) : [],
+      contract: formData.contract,
     };
 
     onCreate(newUniversity);
@@ -120,7 +123,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w_you-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                 placeholder="e.g., Harvard University"
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -240,7 +243,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
                 name="email_domain"
                 value={formData.email_domain}
                 onChange={handleChange}
-                className="w-full p-2 border Rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                 placeholder="e.g., @harvard.edu"
               />
             </div>
@@ -330,6 +333,21 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
                 ))}
               </select>
             </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Contract</label>
+              <select
+                name="contract"
+                value={formData.contract}
+                onChange={handleChange}
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                {contractOptions.map((contract) => (
+                  <option key={contract} value={contract}>
+                    {contract}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex justify-end space-x-2 mt-6">
             <button
@@ -351,4 +369,5 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
     </div>
   );
 };
+
 export default CreateUniversityModal;
