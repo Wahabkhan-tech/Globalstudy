@@ -10,7 +10,9 @@ import AssignedStudentsTable from './Counselor/AssignedStudentsTable';
 import RecentActivityFeed from './Counselor/RecentActivityFeed';
 import ChatSummaryCard from './Counselor/ChatSummaryCard';
 import FiltersPanel from './Counselor/FiltersPanel';
-import User from '../../pages/Users'; // Adjust path as needed
+import User from '../../pages/Users';
+// Placeholder for Students component (uncomment and adjust path as needed)
+// import Students from '../../pages/Students'; // Adjust path as needed
 import {
   UserGroupIcon,
   ClockIcon,
@@ -37,7 +39,15 @@ import {
   AcademicCapIcon,
   QuestionMarkCircleIcon,
   BookOpenIcon,
+  UserCircleIcon,
+  BuildingOffice2Icon,
+  RectangleStackIcon,
+  HomeIcon,
+  TicketIcon,
 } from '@heroicons/react/24/outline';
+
+// Temporary placeholder for Students component to avoid runtime error
+const Students = () => <div>Students Component Placeholder</div>;
 
 const Dashboard = () => {
   const { userRole } = useOutletContext() || {};
@@ -45,43 +55,14 @@ const Dashboard = () => {
 
   console.log('Dashboard userRole:', userRole);
 
-  const featureRoutes = {
-    'User Management': '/users',
-    'Analytics': '/analytics',
-    'Content Management': '/content',
-    'Help-Desk Officer': '/helpdesk',
-    'Media Uploads': '/media',
-    'Profile View': '/profile',
-    'Course Access': '/courses',
-    'Course Management': '/courses',
-    'Student Management': '/students',
-    'User Queries': '/queries',
-    'Upload Data': '/helpdesk/upload-data',
-    'Data Records': '/helpdesk/data-records',
-  };
-
-  const featureIcons = {
-    'User Management': UserGroupIcon,
-    'Analytics': ChartPieIcon,
-    'Content Management': DocumentTextIcon,
-    'Help-Desk Officer': QuestionMarkCircleIcon,
-    'Media Uploads': FilmIcon,
-    'Profile View': UserIcon,
-    'Course Access': BookOpenIcon,
-    'Course Management': AcademicCapIcon,
-    'Student Management': UserGroupIcon,
-    'User Queries': QuestionMarkCircleIcon,
-    'Upload Data': DocumentArrowUpIcon,
-    'Data Records': DocumentTextIcon,
-  };
-
+  // Define features and menu items for super_admin (copied from Sidebar.js)
   const features = {
     super_admin: [
-      'User Management',
-      'Analytics',
-      'Content Management',
-      'Help-Desk Officer',
-      'Media Uploads',
+      'Student Management',
+      'Counselor Management',
+      'Course Management',
+      'Universities',
+      'Courses Table',
     ],
     admin: [
       'User Management',
@@ -95,6 +76,107 @@ const Dashboard = () => {
     media_channel: ['Content Management', 'Media Uploads'],
     helpdesk_officer: ['Help-Desk Officer', 'User Queries', 'Upload Data', 'Data Records'],
   };
+
+  const baseMenuItems = [
+    { name: 'Dashboard', path: '/', icon: HomeIcon, feature: null },
+    { name: 'Users', path: '/users', icon: UserGroupIcon, feature: 'User Management' },
+    { name: 'Analytics', path: '/analytics', icon: ChartBarIcon, feature: 'Analytics' },
+    { name: 'Content', path: '/content', icon: DocumentTextIcon, feature: 'Content Management' },
+    { name: 'Helpdesk', path: '/helpdesk', icon: TicketIcon, feature: 'Help-Desk Officer' },
+    { name: 'Media', path: '/media', icon: FilmIcon, feature: 'Media Uploads' },
+    { name: 'Profile', path: '/profile', icon: UserIcon, feature: 'Profile View' },
+    { name: 'Courses', path: '/courses', icon: BookOpenIcon, feature: 'Course Access' },
+    {
+      name: 'Courses',
+      path: '/courses',
+      icon: BookOpenIcon,
+      feature: 'Course Management',
+      subItems: [
+        { name: 'Universities', path: '/courses/universities', icon: BuildingOffice2Icon, feature: 'Universities' },
+        { name: 'Courses Table', path: '/courses/table', icon: RectangleStackIcon, feature: 'Courses Table' },
+      ],
+    },
+    { name: 'Students', path: '/students', icon: AcademicCapIcon, feature: 'Student Management' },
+    { name: 'Counselors', path: '/counselors', icon: UserCircleIcon, feature: 'Counselor Management' },
+    { name: 'Queries', path: '/queries', icon: QuestionMarkCircleIcon, feature: 'User Queries' },
+    { name: 'Upload Data', path: '/helpdesk/upload-data', icon: DocumentTextIcon, feature: 'Upload Data' },
+    { name: 'Data Records', path: '/helpdesk/data-records', icon: DocumentTextIcon, feature: 'Data Records' },
+  ];
+
+  const featureRoutes = {
+    'User Management': '/users',
+    'Analytics': '/analytics',
+    'Content Management': '/content',
+    'Help-Desk Officer': '/helpdesk',
+    'Media Uploads': '/media',
+    'Profile View': '/profile',
+    'Course Access': '/courses',
+    'Course Management': '/courses',
+    'Student Management': '/students',
+    'Counselor Management': '/counselors',
+    'User Queries': '/queries',
+    'Upload Data': '/helpdesk/upload-data',
+    'Data Records': '/helpdesk/data-records',
+    'Universities': '/courses/universities',
+    'Courses Table': '/courses/table',
+  };
+
+  const featureIcons = {
+    'User Management': UserGroupIcon,
+    'Analytics': ChartPieIcon,
+    'Content Management': DocumentTextIcon,
+    'Help-Desk Officer': QuestionMarkCircleIcon,
+    'Media Uploads': FilmIcon,
+    'Profile View': UserIcon,
+    'Course Access': BookOpenIcon,
+    'Course Management': AcademicCapIcon,
+    'Student Management': UserGroupIcon,
+    'Counselor Management': UserCircleIcon,
+    'User Queries': QuestionMarkCircleIcon,
+    'Upload Data': DocumentArrowUpIcon,
+    'Data Records': DocumentTextIcon,
+    'Universities': BuildingOffice2Icon,
+    'Courses Table': RectangleStackIcon,
+  };
+
+  // Map feature names to display names for FeatureCard (to match Sidebar menu item names)
+  const featureDisplayNames = {
+    'Student Management': 'Students',
+    'Counselor Management': 'Counselors',
+    'Course Management': 'Courses',
+    'Universities': 'Universities',
+    'Courses Table': 'Courses Table',
+  };
+
+  // Compute menu items for super_admin
+  const allowedFeatures = features[userRole] || [];
+  const menuItems = userRole === 'super_admin'
+    ? baseMenuItems.filter(
+        (item) => item.feature === null || allowedFeatures.includes(item.feature)
+      )
+    : [];
+
+  // Derive features to display for super_admin, including submenu items
+  const superAdminFeatures = userRole === 'super_admin'
+    ? menuItems
+        .filter((item) => item.feature && item.path !== '/') // Exclude Dashboard
+        .map((item) => ({
+          feature: item.feature,
+          displayName: featureDisplayNames[item.feature] || item.feature,
+        }))
+        .concat(
+          menuItems
+            .filter((item) => item.subItems)
+            .flatMap((item) =>
+              item.subItems
+                .filter((subItem) => allowedFeatures.includes(subItem.feature))
+                .map((subItem) => ({
+                  feature: subItem.feature,
+                  displayName: featureDisplayNames[subItem.feature] || subItem.feature,
+                }))
+            )
+        )
+    : [];
 
   const superAdminMetrics = [
     { title: 'Total Leads', value: 26, color: 'bg-blue-500', icon: UserGroupIcon, type: 'metric' },
@@ -131,7 +213,6 @@ const Dashboard = () => {
     { title: 'Helpdesk Deleted', value: 0, color: 'bg-red-500', icon: MinusCircleIcon, type: 'user', role: 'helpdesk_officer' },
   ];
 
-  // Mock user data for super_admin User Management
   const mockUsers = [
     { id: 'S001', name: 'Jane Smith', role: 'student', status: 'Active', assignedTo: '', region: 'North America' },
     { id: 'C001', name: 'Dr. Lee', role: 'counselor', status: 'Active', assignedTo: 'Admin', region: 'Asia' },
@@ -141,17 +222,14 @@ const Dashboard = () => {
 
   const handleAssign = (id) => {
     console.log(`Assigning user ${id}`);
-    // Add assign logic (e.g., API call)
   };
 
   const handleUpdateStatus = (id, status) => {
     console.log(`Updating user ${id} status to ${status}`);
-    // Add status update logic (e.g., API call)
   };
 
   const handleView = (user) => {
     console.log(`Viewing user:`, user);
-    // Add view logic (e.g., navigate to user profile)
   };
 
   if (userRole === 'student') {
@@ -189,21 +267,21 @@ const Dashboard = () => {
           role="super_admin"
           users={mockUsers}
           onAssign={handleAssign}
-          onupdatesStatus={handleUpdateStatus}
+          onUpdateStatus={handleUpdateStatus} // Fixed prop name
           onView={handleView}
         />
       );
     }
     return (
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Welcome, Super Admin!</h2>       
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Welcome, Super Admin!</h2>
         <div>
           <h3 className="text-xl font-semibold mb-4 text-gray-800">Admin Features</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features[userRole].map((feature, index) => (
+            {superAdminFeatures.map(({ feature, displayName }, index) => (
               <FeatureCard
                 key={index}
-                feature={feature}
+                feature={displayName} // Use display name for user-friendly text
                 route={featureRoutes[feature]}
                 icon={featureIcons[feature] || DocumentTextIcon}
               />
@@ -234,7 +312,7 @@ const Dashboard = () => {
           role="admin"
           users={mockUsers}
           onAssign={handleAssign}
-          onUpdateStatus={handleUpdateStatus}
+          onUpdateStatus={handleUpdateStatus} // Fixed prop name
           onView={handleView}
         />
       );

@@ -39,7 +39,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, userRole }) => {
     counselor: [
       'Student Management',
       'Help-Desk Officer',
-      // Removed 'Course Management', 'Universities', 'Courses Table'
     ],
     media_channel: ['Content Management', 'Media Uploads'],
     helpdesk_officer: ['Help-Desk Officer', 'User Queries', 'Upload Data', 'Data Records'],
