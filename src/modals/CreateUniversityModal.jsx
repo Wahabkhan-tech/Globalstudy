@@ -123,7 +123,7 @@ const CreateUniversityModal = ({ onClose, onCreate, mode = 'create', university 
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w_you-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                 placeholder="e.g., Harvard University"
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
